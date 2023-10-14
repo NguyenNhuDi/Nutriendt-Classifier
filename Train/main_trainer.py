@@ -54,6 +54,27 @@ def lambda_transform(x: np.array, **kwargs) -> np.array:
     return x / 255
 
 
+def find_mean_std(train_set):
+    sum_ = torch.zeros(3)
+    sq_sum = torch.zeros(3)
+    num_images = 0
+
+    print(f'---finding mean and std ---')
+
+    for data in tqdm(train_set):
+        image = data[0]
+        batch = image.size(0)
+        sum_ += torch.mean(image, dim=[0, 2, 3]) * batch
+        sq_sum += torch.mean(image ** 2, dim=[0, 2, 3]) * batch
+        num_images += batch
+
+    mean = sum_ / num_images
+    std = ((sq_sum / num_images) - mean ** 2) ** 0.5
+
+    print(f'mean: {mean} --- std: {std}')
+    return mean, std
+
+
 def evaluate(val_batches, model):
     model.eval()
     total_correct = 0
@@ -290,9 +311,16 @@ if __name__ == '__main__':
         p=1.0,
     )
 
-    test_set = PlantDataset(img_dirs=image_paths, yml_label=labels, csv_dirs=csv_paths, transform=transform)
+    init_train_set = PlantDataset(img_dirs=image_paths,
+                                  yml_label=labels,
+                                  csv_dirs=csv_paths,
+                                  transform=transform,
+                                  train=True)
 
-    test_loader = DataLoader(test_set, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    init_train_loader = DataLoader(init_train_set,
+                                   batch_size=batch_size,
+                                   shuffle=True,
+                                   num_workers=num_workers)
 
-    for i in tqdm(test_loader):
-        print(i)
+    mean, std = find_mean_std(init_train_loader)
+    
