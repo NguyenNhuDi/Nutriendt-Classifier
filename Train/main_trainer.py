@@ -9,7 +9,6 @@ import albumentations as A
 import torch
 from tqdm import tqdm
 import torch.nn as nn
-import time
 
 import warnings
 
@@ -49,6 +48,10 @@ image_size = 224
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
 model_name = 'res_net50'
+
+
+def lambda_transform(x: np.array, **kwargs) -> np.array:
+    return x / 255
 
 
 def evaluate(val_batches, model):
@@ -218,8 +221,73 @@ if __name__ == '__main__':
 
     transform = A.Compose(
         transforms=[
-            A.Resize(224, 224)
-        ]
+            A.Resize(image_size, image_size),
+
+            A.Flip(p=0.5),
+            A.Rotate(
+                limit=(-90, 90),
+                interpolation=1,
+                border_mode=0,
+                value=0,
+                mask_value=0,
+                always_apply=False,
+                p=0.75,
+            ),
+
+            A.OneOf(
+                transforms=[
+                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                ],
+                p=0.2,
+            ),
+            A.OneOf(
+                transforms=[
+                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                ],
+                p=0.2,
+            ),
+            A.OneOf(
+                transforms=[
+                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                ],
+                p=0.2,
+            ),
+            A.OneOf(
+                transforms=[
+                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                ],
+                p=0.2,
+            ),
+            A.OneOf(
+                transforms=[
+                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                ],
+                p=0.2,
+            ),
+
+            A.Lambda(image=lambda_transform)
+        ],
+        p=1.0,
     )
 
     test_set = PlantDataset(img_dirs=image_paths, yml_label=labels, csv_dirs=csv_paths, transform=transform)
