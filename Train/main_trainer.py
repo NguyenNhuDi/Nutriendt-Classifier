@@ -1,12 +1,17 @@
 import os
 import yaml
 from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 import pandas as pd
 import numpy as np
 from PIL import Image
 import albumentations as A
 import torch
 from tqdm import tqdm
+
+import warnings
+
+warnings.filterwarnings("ignore")
 
 csv_path = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\april\0_4.csv'
 label_path = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\labels.yml'
@@ -15,9 +20,37 @@ image_paths = [
     r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\DND-Diko-WWWR\WW2020\images'
 ]
 
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+def evaluate(val_batches, model, criterion):
+    model.eval()
+    total_correct = 0
+    total_loss = 0
+    total = 0
+    for data in val_batches:
+        image, label = data
+        image, label = image.to(device), label.to(device)
+
+        with torch.no_grad():
+            outputs = model(image)
+            loss = criterion(outputs, label)
+
+            total_loss += loss.item() * image.size(0)
+            total += image.size(0)
+            _, prediction = outputs.max(1)
+
+            total_correct += (label == prediction).sum()
+
+        loss = total_loss / total
+        accuracy = total_correct / total
+        # print(f'Evaluate --- Epoch: {epoch}, Loss: {loss:6.8f}, Accuracy: {accuracy:6.8f}')
+
+        return loss, accuracy
+
 
 class PlantDataset(Dataset):
-    def __init__(self, img_dirs, yml_label, csv_dir, transform:A.compose=None, train=True, mean=None, std=None):
+    def __init__(self, img_dirs, yml_label, csv_dir, transform: A.Compose = None, train=True, mean=None, std=None):
         self.img_dirs = img_dirs
         self.yml_labels = yml_label
         data = pd.read_csv(csv_dir)
@@ -92,6 +125,15 @@ if __name__ == '__main__':
     with open(label_path, 'r') as f:
         labels = yaml.safe_load(f)
 
-    test_set = PlantDataset(img_dirs=image_paths, yml_label=labels, csv_dir=csv_path)
+    transform = A.Compose(
+        transforms=[
+            A.Resize(224, 224)
+        ]
+    )
 
-    test_set.__getitem__(2)
+    # test_set = PlantDataset(img_dirs=image_paths, yml_label=labels, csv_dir=csv_path, transform=transform)
+    #
+    # test_loader = DataLoader(test_set, batch_size=32, shuffle=True, num_workers=7)
+    #
+    # for i in tqdm(test_loader):
+    #     print(i)
