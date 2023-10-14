@@ -11,6 +11,8 @@ from tqdm import tqdm
 import torch.nn as nn
 import argparse
 import json
+from torchvision import models
+import sys
 
 import warnings
 
@@ -208,6 +210,53 @@ class PlantDataset(Dataset):
         out_label = torch.tensor(out_label).long()
 
         return out_image, out_label
+
+
+class ModelChooser:
+    def __init__(self, model_name):
+        self.model_name = model_name
+
+    def __call__(self):
+        return self.__choose_model__()
+
+    def __choose_model__(self):
+        model = None
+
+        if self.model_name == 'efficientnet_b6':
+            model = models.efficientnet_b6(pretrained=True)
+
+            model.classifier = nn.Sequential(
+                nn.Dropout(p=0.5, inplace=True),
+                nn.Linear(in_features=2304, out_features=256),
+                nn.Linear(in_features=256, out_features=7)
+            )
+        elif self.model_name == 'efficientnet_v2_m':
+            model = models.efficientnet_v2_m(pretrained=True)
+
+            model.classifier = nn.Sequential(
+                nn.Dropout(p=0.3, inplace=True),
+                nn.Linear(in_features=1280, out_features=1000),
+                nn.ReLU(inplace=True),
+                nn.Linear(in_features=1000, out_features=7)
+            )
+        elif self.model_name == 'resnet152':
+            model = models.resnet152(pretrained=True)
+
+            model.fc = nn.Sequential(
+                nn.Linear(in_features=2048, out_features=256),
+                nn.Linear(in_features=256, out_features=7)
+            )
+        elif self.model_name == 'resnext101_32x8d':
+            model = models.resnext101_32x8d(pretrained=True)
+
+            model.fc = nn.Sequential(
+                nn.Linear(in_features=2048, out_features=256),
+                nn.Linear(in_features=256, out_features=7)
+            )
+        else:
+            sys.exit(f'Model: {self.model_name} is not part of the registered models')
+
+        return model
 
 
 if __name__ == '__main__':
