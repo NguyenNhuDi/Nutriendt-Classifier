@@ -150,6 +150,7 @@ class PlantDataset(Dataset):
                 self.images += data['train'].values.tolist()
             else:
                 self.temp = data['val'].values.tolist()
+                print(self.temp)
                 out = None
                 for index, item in enumerate(self.temp):
                     try:
@@ -170,9 +171,9 @@ class PlantDataset(Dataset):
         image_name = self.images[index]
 
         try:
-            out_image = np.array(Image.open(os.path.join(self.img_dirs[0], image_name)))
+            out_image = np.array(Image.open(os.path.join(self.img_dirs[0], f'{image_name}')))
         except FileNotFoundError:
-            out_image = np.array(Image.open(os.path.join(self.img_dirs[1], image_name)))
+            out_image = np.array(Image.open(os.path.join(self.img_dirs[1], f'{image_name}')))
 
         if self.transform is not None:
             augmenter = self.transform(image=out_image)
@@ -260,6 +261,11 @@ class ModelChooser:
 
 
 if __name__ == '__main__':
+    print(f'Begin Code....')
+
+    
+
+
     parser = argparse.ArgumentParser(
         prog='Model Trainer',
         description='This program will train a model',
@@ -396,6 +402,8 @@ if __name__ == '__main__':
     model = model_chooser()
     model.to(device)
 
+    print(f'--- begin training ---')
+
     for train_id in args['run_id']:
         train_model(model=model,
                     val_batches=val_loader,
@@ -403,7 +411,7 @@ if __name__ == '__main__':
                     es=args['epoch_step'],
                     g=args['gamma'][train_id],
                     wd=args['weight_decay'][train_id],
-                    lr=args['learning_rate'[train_id]],
+                    lr=args['learning_rate'][train_id],
                     m=args['momentum'][train_id],
                     run_name=train_id,
                     std_mean_vals=mean_std_value,

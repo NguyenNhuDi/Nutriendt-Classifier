@@ -6,11 +6,11 @@ from tqdm import tqdm
 import numpy as np
 
 source_label_paths = [
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\DND-Diko-WWWR\WW2020\labels_trainval.yml',
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\DND-Diko-WWWR\WR2021\labels_trainval.yml'
+    r'/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/labels_trainval.yml',
+    r'/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/labels_trainval.yml'
 ]
 
-output_path = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs'
+output_path = r'/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs'
 folds = 5
 seed = 12345654321
 val_percent = 0.2
@@ -93,11 +93,11 @@ if __name__ == '__main__':
 
                 for index in val_index:
                     if month == 0:
-                        march_csvs[j]['val'].append(str(classes[month][i][index]).split('.')[0])
+                        march_csvs[j]['val'].append(classes[month][i][index])
                     elif month == 1:
-                        apr_csvs[j]['val'].append(str(classes[month][i][index]).split('.')[0])
+                        apr_csvs[j]['val'].append(classes[month][i][index])
                     else:
-                        may_csvs[j]['val'].append(str(classes[month][i][index]).split('.')[0])
+                        may_csvs[j]['val'].append(classes[month][i][index])
 
         for i in range(folds):
             if month == 0:
