@@ -35,5 +35,5 @@
   "epochs": 50,
   "epoch_step":10,
   "image_size":224,
-  "model_name": "res_net50"
+  "model_name": "resnet152"
 }

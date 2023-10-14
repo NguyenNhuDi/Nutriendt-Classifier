@@ -390,3 +390,24 @@ if __name__ == '__main__':
                             batch_size=batch_size,
                             shuffle=True,
                             num_workers=num_workers)
+
+    model_chooser = ModelChooser(args['model_name'])
+
+    model = model_chooser()
+    model.to(device)
+
+    for train_id in args['run_id']:
+        train_model(model=model,
+                    val_batches=val_loader,
+                    train_batches=train_loader,
+                    es=args['epoch_step'],
+                    g=args['gamma'][train_id],
+                    wd=args['weight_decay'][train_id],
+                    lr=args['learning_rate'[train_id]],
+                    m=args['momentum'][train_id],
+                    run_name=train_id,
+                    std_mean_vals=mean_std_value,
+                    model_save_path=args['model_save_dir'],
+                    model_name=args['model_name'],
+                    model_save_dir=args['model_save_dir'],
+                    epochs=args['epochs'])
