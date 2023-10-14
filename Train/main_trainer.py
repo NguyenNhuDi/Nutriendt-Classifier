@@ -9,6 +9,8 @@ import albumentations as A
 import torch
 from tqdm import tqdm
 import torch.nn as nn
+import argparse
+import json
 
 import warnings
 
@@ -16,6 +18,7 @@ warnings.filterwarnings("ignore")
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 criterion = nn.CrossEntropyLoss()
+
 
 def lambda_transform(x: np.array, **kwargs) -> np.array:
     return x / 255
@@ -70,7 +73,7 @@ def evaluate(val_batches, model):
 
 
 def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name, std_mean_vals,
-                model_save_path, model_name):
+                model_save_path, model_name, model_save_dir, epochs):
     model = model.double()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=m, weight_decay=wd)
 
@@ -208,6 +211,24 @@ class PlantDataset(Dataset):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+        prog='Model Trainer',
+        description='This program will train a model',
+        epilog='Vision Research Lab')
+    parser.add_argument('-c', '--config', required=True,
+                        help='The path to the config file.')
+    args = parser.parse_args()
+
+    with open(args.config) as f:
+        args = json.load(f)
+
+    label_path = args['label_path']
+    image_size = args['image_size']
+    image_paths = args['image_paths']
+    csv_paths = args['csv_paths']
+    batch_size = args['batch_size']
+    num_workers = args['num_workers']
+
     with open(label_path, 'r') as f:
         labels = yaml.safe_load(f)
 
