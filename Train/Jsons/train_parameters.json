@@ -1,0 +1,39 @@
+{
+  "csv_paths":[
+    "C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\Labels_and_csvs\\april\\0_4.csv",
+    "C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\Labels_and_csvs\\march\\0_3.csv",
+    "C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\Labels_and_csvs\\may\\0_5.csv"
+    ],
+
+  "label_path":"C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\Labels_and_csvs\\labels.yml",
+
+  "image_paths": [
+    "C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\DND-Diko-WWWR\\WR2021\\images",
+    "C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\DND-Diko-WWWR\\WW2020\\images"
+  ],
+
+  "model_save_dir":"C:\\Users\\coanh\\Desktop\\Uni Work\\Nutrient Classifier\\Nutriend-Classifier\\Models",
+
+  "run_id":[
+    0
+  ],
+  "momentum": [
+  0.9
+  ],
+
+  "learning_rate":[
+    0.01
+  ],
+  "weight_decay":[
+    0
+  ],
+  "gamma":[
+    0.75
+  ],
+  "batch_size": 32,
+  "num_workers": 7,
+  "epochs": 50,
+  "epoch_step":10,
+  "image_size":224,
+  "model_name": "res_net50"
+}

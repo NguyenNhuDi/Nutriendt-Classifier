@@ -14,41 +14,8 @@ import warnings
 
 warnings.filterwarnings("ignore")
 
-csv_paths = [
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\april\0_4.csv',
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\march\0_3.csv',
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\may\0_5.csv'
-]
-label_path = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Labels_and_csvs\labels.yml'
-image_paths = [
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\DND-Diko-WWWR\WR2021\images',
-    r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\DND-Diko-WWWR\WW2020\images'
-]
-
-model_save_dir = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Models'
-
-run_id = [
-    0
-]
-
-batch_size = 32
-num_workers = 7
-
-epochs = 50
-criterion = nn.CrossEntropyLoss()
-
-momentum = [0.9]
-learning_rate = [0.01]
-weight_decay = [0]
-gamma = [0.75]
-
-epoch_step = 10
-image_size = 224
-
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
-
-model_name = 'res_net50'
-
+criterion = nn.CrossEntropyLoss()
 
 def lambda_transform(x: np.array, **kwargs) -> np.array:
     return x / 255
@@ -72,7 +39,8 @@ def find_mean_std(train_set):
     std = ((sq_sum / num_images) - mean ** 2) ** 0.5
 
     print(f'mean: {mean} --- std: {std}')
-    return mean, std
+    message = f'mean: {mean} --- std: {std}'f'mean: {mean} --- std: {std}'
+    return mean, std, message
 
 
 def evaluate(val_batches, model):
@@ -101,11 +69,14 @@ def evaluate(val_batches, model):
         return loss, accuracy
 
 
-def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name):
+def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name, std_mean_vals,
+                model_save_path, model_name):
     model = model.double()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=m, weight_decay=wd)
 
     output_file = open(os.path.join(model_save_dir, f'{run_name}.txt'), 'w')
+
+    output_file.write(f'{std_mean_vals}\n')
 
     total = 0
     total_correct = 0
@@ -150,7 +121,7 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name):
         if eval_accuracy >= best_accuracy:
             best_accuracy = eval_accuracy
             best_epoch = epoch
-            torch.save(model, model_save_dir)
+            torch.save(model, os.path.join(model_save_path, f'{model_name}_{run_name}.pt'))
             best_loss = eval_loss if eval_loss <= best_loss else best_loss
         message = f'Best Accuracy: {best_accuracy:6.8f} --- Best Loss: {best_loss:6.8f}\n' \
                   f'Current Epoch: {epoch} --- Best Epoch: {best_epoch}\n'
@@ -322,5 +293,30 @@ if __name__ == '__main__':
                                    shuffle=True,
                                    num_workers=num_workers)
 
-    mean, std = find_mean_std(init_train_loader)
-    
+    mean, std, mean_std_value = find_mean_std(init_train_loader)
+
+    train_set = PlantDataset(img_dirs=image_paths,
+                             yml_label=labels,
+                             csv_dirs=csv_paths,
+                             transform=transform,
+                             train=True,
+                             std=std,
+                             mean=mean)
+
+    val_set = PlantDataset(img_dirs=image_paths,
+                           yml_label=labels,
+                           csv_dirs=csv_paths,
+                           transform=transform,
+                           train=False,
+                           std=std,
+                           mean=mean)
+
+    train_loader = DataLoader(train_set,
+                              batch_size=batch_size,
+                              shuffle=True,
+                              num_workers=num_workers)
+
+    val_loader = DataLoader(val_set,
+                            batch_size=batch_size,
+                            shuffle=True,
+                            num_workers=num_workers)
