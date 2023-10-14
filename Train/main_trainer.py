@@ -28,6 +28,10 @@ image_paths = [
 
 model_save_dir = r'C:\Users\coanh\Desktop\Uni Work\Nutrient Classifier\Nutriend-Classifier\Models'
 
+run_id = [
+    0
+]
+
 batch_size = 32
 num_workers = 7
 
@@ -73,9 +77,11 @@ def evaluate(val_batches, model):
         return loss, accuracy
 
 
-def train_model(model, val_batches, train_batches, es, g, lr, m, wd):
+def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name):
     model = model.double()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=m, weight_decay=wd)
+
+    output_file = open(os.path.join(model_save_dir, f'{run_name}.txt'), 'w')
 
     total = 0
     total_correct = 0
@@ -88,8 +94,6 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd):
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer, es, g)
 
     for epoch in range(epochs):
-        start = time.time()
-
         for data in tqdm(train_batches):
             image, label = data
             image, label = image.to(device), label.to(device)
@@ -106,7 +110,6 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd):
 
             total_loss += loss.item() * image.size(0)
 
-        time_per_epoch = time.time() - start
         eval_loss, eval_accuracy = evaluate(val_batches, model)
 
         model.train()
@@ -114,19 +117,24 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd):
         train_total_loss = total_loss / total
         train_accuracy = total_correct / total
 
-        print(f'--- Epoch time: {time_per_epoch / 60.0:6.8f} minutes ---\n'
-              f'Train Accuracy: {train_accuracy:6.8f} --- Train Loss: {train_total_loss:6.8f}\n'
-              f'Eval Accuracy: {eval_accuracy:6.8f} --- Eval Loss: {eval_loss:6.8f}')
+        message = f'Train Accuracy: {train_accuracy:6.8f} --- Train Loss: {train_total_loss:6.8f}\n' \
+                  f'Eval Accuracy: {eval_accuracy:6.8f} --- Eval Loss: {eval_loss:6.8f}\n'
+
+        print(message, end='')
+        output_file.write(message)
 
         if eval_accuracy >= best_accuracy:
             best_accuracy = eval_accuracy
             best_epoch = epoch
             torch.save(model, model_save_dir)
             best_loss = eval_loss if eval_loss <= best_loss else best_loss
-        print(f'Best Accuracy: {best_accuracy:6.8f} --- Best Loss: {best_loss:6.8f}\n'
-              f'Current Epoch: {epoch} --- Best Epoch: {best_epoch}')
+        message = f'Best Accuracy: {best_accuracy:6.8f} --- Best Loss: {best_loss:6.8f}\n' \
+                  f'Current Epoch: {epoch} --- Best Epoch: {best_epoch}\n'
+
+        print(message, end='')
 
         scheduler.step()
+    output_file.close()
 
 
 class PlantDataset(Dataset):
