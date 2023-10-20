@@ -69,19 +69,19 @@ def evaluate(val_batches, model):
 
         loss = total_loss / total
         accuracy = total_correct / total
-        # print(f'Evaluate --- Epoch: {epoch}, Loss: {loss:6.8f}, Accuracy: {accuracy:6.8f}')
-
         return loss, accuracy
 
 
 def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name, std_mean_vals,
-                model_save_path, model_name, model_save_dir, epochs):
+                model_save_path, model_name, model_save_dir, epochs, out_name):
     model = model.double()
     optimizer = torch.optim.SGD(model.parameters(), lr=lr, momentum=m, weight_decay=wd)
 
-    output_file = open(os.path.join(model_save_dir, f'{run_name}.txt'), 'w')
+    output_file = open(os.path.join(model_save_dir, f'{out_name}.txt'), 'w')
 
     output_file.write(f'{std_mean_vals}\n')
+    output_file.write(f'momentum: {m} --- learning rate: {lr} --- weight decay: {wd} --- gamma: {g}\n')
+    print((f'momentum: {m} --- learning rate: {lr} --- weight decay: {wd} --- gamma: {g}'))
 
     total = 0
     total_correct = 0
@@ -128,13 +128,16 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name, s
             best_epoch = epoch
             torch.save(model, os.path.join(model_save_path, f'{model_name}_{run_name}.pt'))
             best_loss = eval_loss if eval_loss <= best_loss else best_loss
+        
         message = f'Best Accuracy: {best_accuracy:6.8f} --- Best Loss: {best_loss:6.8f}\n' \
                   f'Current Epoch: {epoch} --- Best Epoch: {best_epoch}\n'
 
         print(message, end='')
+        output_file.write(message)
 
         scheduler.step()
     output_file.close()
+    torch.save(model, os.path.join(model_save_path, f'{model_name}_{run_name}_final.pt'))
 
 
 class PlantDataset(Dataset):
@@ -150,14 +153,12 @@ class PlantDataset(Dataset):
                 self.images += data['train'].values.tolist()
             else:
                 self.temp = data['val'].values.tolist()
-                print(self.temp)
                 out = None
-                for index, item in enumerate(self.temp):
-                    try:
-                        int(item)
-                    except ValueError:
-                        out = index
+                for i, item in enumerate(self.temp):
+                    if type(item) is float:
+                        out = i
                         break
+
                 self.images += self.temp[: out]
 
         self.transform = transform
@@ -263,9 +264,6 @@ class ModelChooser:
 if __name__ == '__main__':
     print(f'Begin Code....')
 
-    
-
-
     parser = argparse.ArgumentParser(
         prog='Model Trainer',
         description='This program will train a model',
@@ -368,9 +366,8 @@ if __name__ == '__main__':
                                    batch_size=batch_size,
                                    shuffle=True,
                                    num_workers=num_workers)
-
     mean, std, mean_std_value = find_mean_std(init_train_loader)
-
+    
     train_set = PlantDataset(img_dirs=image_paths,
                              yml_label=labels,
                              csv_dirs=csv_paths,
@@ -404,16 +401,18 @@ if __name__ == '__main__':
 
     print(f'--- begin training ---')
 
-    for train_id in args['run_id']:
+    train_id = args['run_id']
+    for i in range(len(train_id)):
         train_model(model=model,
                     val_batches=val_loader,
                     train_batches=train_loader,
                     es=args['epoch_step'],
-                    g=args['gamma'][train_id],
-                    wd=args['weight_decay'][train_id],
-                    lr=args['learning_rate'][train_id],
-                    m=args['momentum'][train_id],
-                    run_name=train_id,
+                    g=args['gamma'][i],
+                    wd=args['weight_decay'][i],
+                    lr=args['learning_rate'][i],
+                    m=args['momentum'][i],
+                    run_name=train_id[i],
+                    out_name=args['out_name'][i],
                     std_mean_vals=mean_std_value,
                     model_save_path=args['model_save_dir'],
                     model_name=args['model_name'],
