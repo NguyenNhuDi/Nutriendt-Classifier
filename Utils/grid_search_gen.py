@@ -32,10 +32,8 @@ if __name__ == '__main__':
 
         "label_path": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/labels.yml",
 
-        "image_paths": [
-            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/images",
-            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/images"
-        ],
+        "21_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/images",
+        "20_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/images",
 
         "model_save_dir": args['save_dir'],
 
@@ -52,9 +50,11 @@ if __name__ == '__main__':
         "image_size": args['image_size'],
         "model_name": args['model_name']
     }
+
         for i in range(num_files)]
 
     all_combo = list(product(lr, m, wd, g))
+
     all_len = len(all_combo)
 
     index = 0
@@ -76,8 +76,8 @@ if __name__ == '__main__':
                     else:
                         out_jsons[i]['gamma'].append(value)
 
-                    index += 1
-                    counter += 1
+                index += 1
+                counter += 1
                 out_jsons[i]['run_id'].append(2)
                 out_jsons[i]['out_name'].append(name_counter)
                 name_counter += 1
@@ -97,12 +97,13 @@ if __name__ == '__main__':
                     else:
                         out_jsons[i]['gamma'].append(value)
 
-                    index += 1
+                index += 1
                 out_jsons[i]['run_id'].append(2)
                 out_jsons[i]['out_name'].append(name_counter)
                 name_counter += 1
 
         json_string = json.dumps(out_jsons[i], indent=2)
+
         with open(os.path.join(save_file, f"{args['model_name']}_{i}.json"), 'w') as out:
             out.write(json_string)
 
