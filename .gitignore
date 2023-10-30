@@ -1,1 +1,6 @@
 *.jpg
+*.pt
+*.slurm
+*.out
+*.txt
+*.pth
