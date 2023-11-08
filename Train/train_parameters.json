@@ -7,10 +7,10 @@
 
   "label_path": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/labels.yml",
 
-  "image_paths": [
-    "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/images",
-    "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/images"
-  ],
+
+  "21_dir" : "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/images",
+  "20_dir" : "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/images",
+
 
   "model_save_dir":"/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models",
 
@@ -37,7 +37,7 @@
   ],
   "batch_size": 32,
   "num_workers": 20,
-  "epochs": 100,
+  "epochs": 10,
   "epoch_step":10,
   "image_size":224,
   "model_name": "resnet152"

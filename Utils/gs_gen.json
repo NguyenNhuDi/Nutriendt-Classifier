@@ -8,16 +8,16 @@
     "model_name": "resnet152",
     "save_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/GridSearch/Resnet152",
     "lr": [
-        ["lr", 0.1],
-        ["lr", 0.01],
-        ["lr", 0.05],
+        ["lr", 0.1], 
+        ["lr", 0.01], 
+        ["lr", 0.05], 
         ["lr", 0.5]
     ],
-
+    
     "m": [
         ["m", 0.8],
         ["m", 0.9],
-        ["m", 0.7],
+        ["m", 0.7], 
         ["m", 0.6]
     ],
 
@@ -28,7 +28,7 @@
     ],
 
     "g": [
-        ["g", 0.85],
+        ["g", 0.85], 
         ["g", 0.5]
     ]
 

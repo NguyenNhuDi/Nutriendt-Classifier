@@ -1,0 +1,84 @@
+  {
+    "csv_paths": [
+        [
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/april/0_4.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/march/0_3.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/may/0_5.csv"
+        ],
+        [
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/april/1_4.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/march/1_3.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/may/1_5.csv"
+        ],
+        [
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/april/2_4.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/march/2_3.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/may/2_5.csv"
+        ],
+        [
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/april/3_4.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/march/3_3.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/may/3_5.csv"
+        ],
+        [
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/april/4_4.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/march/4_3.csv",
+            "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/may/4_5.csv"
+        ]
+    ],
+    "label_path": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Labels_and_csvs/labels.yml",
+    "21_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/images",
+    "20_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/images",
+    "model_save_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/ResNext101_32x8d",
+    "run_id": [
+     "csv_0",
+     "csv_1",
+     "csv_2",
+     "csv_3",
+     "csv_4"
+    ],
+    "out_name": [
+        0,
+        1,
+        2,
+        3,
+        4
+    ],
+    "momentum": [
+       0.7,
+       0.7,
+       0.7,
+       0.7,
+       0.7
+
+    ],
+    "learning_rate": [
+        0.01,
+        0.01,
+        0.01,
+        0.01,
+        0.01
+    ],
+    "gamma": [
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25
+
+    ],
+    "weight_decay": [
+        1e-05,
+        1e-05,
+        1e-05,
+        1e-05,
+        1e-05
+    ],
+
+    "batch_size": 32,
+    "num_workers": 20,
+    "epochs": 60,
+    "epoch_step": 10,
+    "image_size": 224,
+    "model_name": "resnext101_32x8d"
+  }

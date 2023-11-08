@@ -128,7 +128,7 @@ def train_model(model, val_batches, train_batches, es, g, lr, m, wd, run_name, s
             best_epoch = epoch
             torch.save(model, os.path.join(model_save_path, f'{model_name}_{run_name}.pt'))
             best_loss = eval_loss if eval_loss <= best_loss else best_loss
-
+        
         message = f'Best Accuracy: {best_accuracy:6.8f} --- Best Loss: {best_loss:6.8f}\n' \
                   f'Current Epoch: {epoch} --- Best Epoch: {best_epoch}\n'
 
@@ -368,7 +368,7 @@ if __name__ == '__main__':
                                    shuffle=True,
                                    num_workers=num_workers)
     mean, std, mean_std_value = find_mean_std(init_train_loader)
-
+    
     train_set = PlantDataset(img_dirs=image_paths,
                              yml_label=labels,
                              csv_dirs=csv_paths,

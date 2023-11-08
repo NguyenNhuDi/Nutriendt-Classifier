@@ -14,11 +14,13 @@ import json
 from torchvision import models
 import sys
 
+
 import warnings
 
 warnings.filterwarnings("ignore")
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
 
 
 class ModelChooser:
@@ -68,6 +70,7 @@ class ModelChooser:
         return model
 
 
+
 if __name__ == '__main__':
     print(f'Begin Code....')
 
@@ -100,179 +103,204 @@ if __name__ == '__main__':
     model_save_dir = args['model_save_dir']
     epoch_step = args['epoch_step']
 
+
+
     with open(label_path, 'r') as f:
         labels = yaml.safe_load(f)
 
-    val_paths = []
-    train_paths = []
-
-    for csv_dir in csv_paths:
-        data = pd.read_csv(csv_dir)
-
-        t = data['val'].values.tolist()
-
-        out = None
-        for i, item in enumerate(t):
-            if type(item) is float:
-                out = i
-                break
-
-        val_paths += t[: out]
-
-        train_paths += data['train'].values.tolist()
-
     print(f'---- Opening Images ----')
-    train_imgs = []
-    val_imgs = []
 
-    for train_name in tqdm(train_paths):
-        image_path = os.path.join(_21_dir, train_name) if train_name[3] == '1' else os.path.join(_20_dir, train_name)
+    all_imgs = {}
 
+    for img_name in tqdm(labels):
+        image_path = os.path.join(_21_dir, img_name) if img_name[3] == '1' else os.path.join(_20_dir, img_name)
         image = np.array(Image.open(image_path))
-        train_imgs.append((image, train_name))
+        all_imgs[img_name] = image
 
-    for val_name in tqdm(val_paths):
-        image_path = os.path.join(_21_dir, val_name) if val_name[3] == '1' else os.path.join(_20_dir, val_name)
 
-        image = np.array(Image.open(image_path))
-        val_imgs.append((image, val_name))
 
-    train_transform = A.Compose(
-        transforms=[
-            A.Resize(image_size, image_size),
+    out_json = {
+        "20_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/test.txt",
+        "21_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/test.txt",
+        "save_dir": "",
+        "models": [],
+        "image_size": [],
+        "mean": [],
+        "std": [],
+        "batch_size": [],
+        "run_amount": 5
+    }
 
-            A.Flip(p=0.5),
-            A.Rotate(
-                limit=(-90, 90),
-                interpolation=1,
-                border_mode=0,
-                value=0,
-                mask_value=0,
-                always_apply=False,
-                p=0.75,
-            ),
-
-            A.OneOf(
-                transforms=[
-                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
-                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
-                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
-                ],
-                p=0.2,
-            ),
-            A.OneOf(
-                transforms=[
-                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
-                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
-                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
-                ],
-                p=0.2,
-            ),
-            A.OneOf(
-                transforms=[
-                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
-                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
-                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
-                ],
-                p=0.2,
-            ),
-            A.OneOf(
-                transforms=[
-                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
-                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
-                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
-                ],
-                p=0.2,
-            ),
-            A.OneOf(
-                transforms=[
-                    A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
-                    A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
-                    A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
-                    A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
-                ],
-                p=0.2,
-            ),
-
-            A.Lambda(image=lambda_transform)
-        ],
-        p=1.0,
-    )
-
-    val_transform = A.Compose(
-        transforms=[
-            A.Resize(image_size, image_size),
-
-            A.Flip(p=0.5),
-            A.Rotate(
-                limit=(-90, 90),
-                interpolation=1,
-                border_mode=0,
-                value=0,
-                mask_value=0,
-                always_apply=False,
-                p=0.75,
-            ),
-            A.Lambda(image=lambda_transform)
-
-        ],
-        p=1.0
-    )
-
-    mean_std_dsal = DSAL(images=train_imgs,
-                         read_and_transform_function=transform_image_label,
-                         batch_size=batch_size,
-                         epochs=1,
-                         num_processes=num_workers,
-                         yml=labels,
-                         transform=train_transform)
-
-    mean_std_dsal.start()
-
-    mean, std = find_mean_std(mean_std_dsal)
-
-    mean_std_dsal.join()
-
-    print(f'\n{mean}, {std}')
-
-    val_dsal = DSAL(images=val_imgs,
-                    read_and_transform_function=transform_image_label,
-                    batch_size=batch_size,
-                    epochs=1,
-                    num_processes=num_workers,
-                    yml=labels,
-                    transform=val_transform,
-                    mean=mean,
-                    std=std)
-
-    val_dsal.start()
-
-    val_batches = [val_dsal.get_item() for i in range(val_dsal.num_batches)]
-
-    val_dsal.join()
-
-    print(f'\n\n\n------ start training ------\n\n')
 
     for i, output_file_name in enumerate(out_name):
+
+        val_paths = []
+        train_paths = []
+
+        for csv_dir in csv_paths[i]:
+            data = pd.read_csv(csv_dir)
+
+            t = data['val'].values.tolist()
+
+            out = None
+            for j, item in enumerate(t):
+                if type(item) is float:
+                    out = j
+                    break
+
+            val_paths += t[: out]
+
+            train_paths += data['train'].values.tolist()
+
+
+
+        train_imgs = [(all_imgs[image_name], image_name) for image_name in train_paths]
+        val_imgs = [(all_imgs[image_name], image_name) for image_name in val_paths]
+
+        train_transform = A.Compose(
+            transforms=[
+                A.Resize(image_size, image_size),
+
+                A.Flip(p=0.5),
+                A.Rotate(
+                    limit=(-90, 90),
+                    interpolation=1,
+                    border_mode=0,
+                    value=0,
+                    mask_value=0,
+                    always_apply=False,
+                    p=0.75,
+                ),
+
+                A.OneOf(
+                    transforms=[
+                        A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                        A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                        A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf(
+                    transforms=[
+                        A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                        A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                        A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf(
+                    transforms=[
+                        A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                        A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                        A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf(
+                    transforms=[
+                        A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                        A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                        A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                    ],
+                    p=0.2,
+                ),
+                A.OneOf(
+                    transforms=[
+                        A.Defocus(radius=[1, 1], alias_blur=(0.1, 0.3), p=0.2),
+                        A.Sharpen(alpha=(0.01, 0.125), lightness=(1, 1), p=0.2),
+                        A.RGBShift(r_shift_limit=[-5, 5], g_shift_limit=[-3, 3], b_shift_limit=[-5, 5], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[-0.015, 0.015], contrast_limit=[0, 0], p=0.2),
+                        A.RandomBrightnessContrast(brightness_limit=[0.0, 0.0], contrast_limit=[-0.015, 0.015], p=0.2),
+                    ],
+                    p=0.2,
+                ),
+
+                A.Lambda(image=lambda_transform)
+            ],
+            p=1.0,
+        )
+
+
+        val_transform = A.Compose(
+            transforms=[
+                A.Resize(image_size, image_size),
+
+                A.Flip(p=0.5),
+                A.Rotate(
+                    limit=(-90, 90),
+                    interpolation=1,
+                    border_mode=0,
+                    value=0,
+                    mask_value=0,
+                    always_apply=False,
+                    p=0.75,
+                ),
+                A.Lambda(image=lambda_transform)
+
+            ],
+            p=1.0
+        )
+
+
+        mean_std_dsal = DSAL(images=train_imgs,
+                            read_and_transform_function=transform_image_label,
+                            batch_size=batch_size,
+                            epochs=1,
+                            num_processes=num_workers,
+                            yml=labels,
+                            transform=train_transform)
+
+        mean_std_dsal.start()
+
+        mean, std = find_mean_std(mean_std_dsal)
+
+        mean_std_dsal.join()
+
+        
+        out_json["mean"].append(mean)
+        out_json["std"].append(std)
+        out_json["image_size"].append(image_size)
+        out_json["batch_size"].append(batch_size)
+        out_json["models"].append(str(os.path.join(model_save_dir, f'{run_id[i]}_{model_name}_best.pth')))
+
+        val_dsal = DSAL(images=val_imgs,
+                        read_and_transform_function=transform_image_label,
+                        batch_size=batch_size,
+                        epochs=1,
+                        num_processes=num_workers,
+                        yml=labels,
+                        transform=val_transform,
+                        mean=mean,
+                        std=std)
+        
+        val_dsal.start()
+
+        val_batches = [val_dsal.get_item() for i in range(val_dsal.num_batches)]
+
+        val_dsal.join()
+
+
+        print(f'\n\n\n------ start training ------\n\n')
+
         criterion = nn.CrossEntropyLoss()
 
         model_chooser = ModelChooser(model_name=model_name)
         model = model_chooser()
         model.to(device)
 
+
         optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate[i], momentum=momentum[i],
                                     weight_decay=weight_decay[i])
-
-        message = f'--- gamma: {gamma[i]} --- momentum: {momentum[i]} --- learning rate: {learning_rate[i]} --- weight_decay: {weight_decay[i]}\n'
+        
+        message = f'\n{mean}, {std}\n--- gamma: {gamma[i]} --- momentum: {momentum[i]} --- learning rate: {learning_rate[i]} --- weight_decay: {weight_decay[i]}\n'
         print(message)
 
         train(model=model,
@@ -294,3 +322,6 @@ if __name__ == '__main__':
               gamma=gamma[i],
               device=device,
               input_message=message)
+    
+    with open(f'{model_save_dir}/{model_name}.json', 'w') as json_file:
+        json.dump(out_json, json_file, indent=4)
