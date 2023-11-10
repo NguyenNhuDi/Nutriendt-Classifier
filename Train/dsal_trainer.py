@@ -324,4 +324,4 @@ if __name__ == '__main__':
               input_message=message)
     
     with open(f'{model_save_dir}/{model_name}.json', 'w') as json_file:
-        json.dump(out_json, json_file, indent=4)
+        json.dump(out, json_file, indent=4)

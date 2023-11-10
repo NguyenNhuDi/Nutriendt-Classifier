@@ -1,0 +1,41 @@
+{
+    "20_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/test.txt",
+    "21_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/test.txt",
+    "save_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6",
+    "models": [
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6/csv_0_efficientnet_b6_best.pth",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6/csv_1_efficientnet_b6_best.pth",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6/csv_2_efficientnet_b6_best.pth",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6/csv_3_efficientnet_b6_best.pth",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6/csv_4_efficientnet_b6_best.pth"
+    ],
+    "image_size": [
+        528,
+        528,
+        528,
+        528,
+        528
+    ],
+    "mean": [
+        [0.4249, 0.3668, 0.2609],
+        [0.4268, 0.3688, 0.2620],
+        [0.4249, 0.3668, 0.2603],
+        [0.4276, 0.3693, 0.2626],
+        [0.4256, 0.3677, 0.2615]
+    ],
+    "std": [
+        [0.2678, 0.2271, 0.1950],
+        [0.2664, 0.2257, 0.1941],
+        [0.2656, 0.2246, 0.1926],
+        [0.2662, 0.2256, 0.1939],
+        [0.2612, 0.2205, 0.1900]
+    ],
+    "batch_size": [
+        2,
+        2,
+        2,
+        2,
+        2
+    ],
+    "run_amount": 5
+}        
