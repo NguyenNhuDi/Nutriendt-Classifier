@@ -1,7 +1,7 @@
 {
     "20_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WW2020/test.txt",
     "21_test": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/DND-Diko-WWWR/WR2021/test.txt",
-    "save_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Submit/Ensemble_submission/rn_rx",
+    "save_dir": "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Submit/Ensemble_submission/Greedy",
     "models": [
         "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/ResNext101_32x8d/csv_0_resnext101_32x8d_best.pth",
         "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/ResNext101_32x8d/csv_1_resnext101_32x8d_best.pth",
@@ -88,5 +88,15 @@
         2,
         2
     ],
-    "run_amount": 5
+
+    "run_amount": 5,
+
+    "text_path": [
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Efficient Net b6",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/Resnet152",
+        "/home/nhu.nguyen2/Nutrient_Classifier/Nutriendt-Classifier/Models/ResNext101_32x8d"
+    ],
+
+    "choose_top_n": 10
+
 }
