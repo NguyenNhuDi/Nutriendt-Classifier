@@ -1,6 +1,6 @@
 *.jpg
-*.pt
 *.slurm
 *.out
 *.txt
+*.pt
 *.pth
